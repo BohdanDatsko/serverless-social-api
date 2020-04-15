@@ -1,36 +1,32 @@
 import json
 import logging
 import os
-import time
 import uuid
 
 import boto3
 
-dynamodb = boto3.resource("dynamodb")
+db = boto3.resource("dynamodb")
 
 
 def create(event, context):
-    data = json.loads(event["body"])
-    if "text" not in data:
-        logging.error("Validation Failed")
-        raise Exception("Couldn't create the todo item.")
-
-    timestamp = str(time.time())
-
-    table = dynamodb.Table(os.environ["DYNAMODB_TABLE"])
-
-    item = {
-        "id": str(uuid.uuid1()),
-        "text": data["text"],
-        "checked": False,
-        "createdAt": timestamp,
-        "updatedAt": timestamp,
-    }
-
-    # write the todo to the database
-    table.put_item(Item=item)
-
-    # create a response
-    response = {"statusCode": 200, "body": json.dumps(item)}
-
-    return response
+    if event:
+        data = json.loads(event["body"])
+        if "username" not in data:
+            logging.error("Validation Failed")
+            return {"statusCode": 500, "errorMassage": "Couldn't create the user item."}
+        try:
+            table = db.Table(os.environ["DYNAMODB_TABLE"])
+            user_uuid = uuid.uuid1()
+            item = {
+                "id": f"{user_uuid}",
+                "username": data["username"],
+                "email": data["email"],
+                "address": data["address"],
+            }
+            table.put_item(Item=item)  # write the item to the database
+            response = {"statusCode": 200, "user_uuid": f"{user_uuid}"}  # create a response
+            return response
+        except Exception as e:
+            return {"statusCode": 500, "errorMassage": logging.error(f"{e}")}
+    else:
+        return {"statusCode": 500, "errorMassage": "There isn't any body in data"}

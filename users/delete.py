@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -13,4 +14,5 @@ def delete(event, context):
         response = {"statusCode": 200}
         return response
     except Exception as e:
-        return {"statusCode": 500, "errorMassage": logging.error(f"{e}")}
+        err = {"errorMassage": logging.error(f"{e}")}
+        return {"statusCode": 500, "body": json.dumps(err)}

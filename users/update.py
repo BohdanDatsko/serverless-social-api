@@ -31,6 +31,8 @@ def update(event, context):
             response = {"statusCode": 200, "body": json.dumps(result["Attributes"])}
             return response
         except Exception as e:
-            return {"statusCode": 500, "errorMassage": logging.error(f"{e}")}
+            err = {"errorMassage": logging.error(f"{e}")}
+            return {"statusCode": 500, "body": json.dumps(err)}
     else:
-        return {"statusCode": 500, "errorMassage": "There isn't any body in data"}
+        err = {"errorMassage": "There isn't any body in data"}
+        return {"statusCode": 500, "body": json.dumps(err)}

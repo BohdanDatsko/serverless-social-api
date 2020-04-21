@@ -12,7 +12,7 @@ def create(event, context):
     if event:
         """To test locally run 
         serverless invoke local --function create --data
-        '{"body": {"username": "Pethunia Dursley", "email": "test@mail.com", "address": "4 Previt Drive"}}'"""
+        '{"body": {"username": "Sirius Black", "email": "snuffles@gryffindor.com", "address": "13 Grymo Sq."}}'"""
         # data = event["body"]  # locally
         data = json.loads(event["body"])  # remote (AWS)
         if "username" not in data:
@@ -20,7 +20,7 @@ def create(event, context):
             err = {"errorMessage": "Couldn't create the user item."}
             return {"statusCode": 500, "body": json.dumps(err)}
         try:
-            table = db.Table(os.environ["DYNAMODB_TABLE"])
+            table = db.Table(os.environ["USERS_TABLE"])
             user_uuid = uuid.uuid1()
             item = {
                 "id": f"{user_uuid}",
@@ -35,5 +35,5 @@ def create(event, context):
             err = {"errorMessage": logging.error(f"{e}")}
             return {"statusCode": 500, "body": json.dumps(err)}
     else:
-        err = {"errorMessage": "There isn't any body in data"}
+        err = {"errorMessage": "There isn't any body in data."}
         return {"statusCode": 500, "body": json.dumps(err)}

@@ -14,7 +14,7 @@ def update(event, context):
             logging.error("Validation Failed")
             raise Exception("Couldn't update the user item.")
         try:
-            table = db.Table(os.environ["DYNAMODB_TABLE"])
+            table = db.Table(os.environ["USERS_TABLE"])
             result = table.update_item(
                 Key={"id": event["pathParameters"]["id"]},
                 ExpressionAttributeNames={"#username": "username"},

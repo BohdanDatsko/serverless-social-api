@@ -9,7 +9,7 @@ db = boto3.resource("dynamodb")
 
 def delete(event, context):
     try:
-        table = db.Table(os.environ["DYNAMODB_TABLE"])
+        table = db.Table(os.environ["USERS_TABLE"])
         table.delete_item(Key={"id": event["pathParameters"]["id"]})
         response = {"statusCode": 200}
         return response

@@ -3,7 +3,7 @@ provider:
   name: aws
   runtime: python3.8
   environment:
-    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    USERS_TABLE: "users-table-${self:provider.stage}"
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -13,7 +13,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:us-east-1:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+      Resource: "arn:aws:dynamodb:us-east-1:*:table/${self:provider.environment.USERS_TABLE}"
   stage: dev
   region: us-east-1
 
@@ -35,6 +35,14 @@ functions:
           method: post
           cors: true
 
+#  follow:
+#    handler: users/follow.follow
+#    events:
+#      - http:
+#          path: user/{id}
+#          method: put
+#          cors: true
+
   list:
     handler: users/list.list
     events:
@@ -47,7 +55,7 @@ functions:
     handler: users/get.get
     events:
       - http:
-          path: users/{id}
+          path: user/{id}
           method: get
           cors: true
 
@@ -55,7 +63,7 @@ functions:
     handler: users/update.update
     events:
       - http:
-          path: users/{id}
+          path: user/{id}
           method: put
           cors: true
 
@@ -63,13 +71,13 @@ functions:
     handler: users/delete.delete
     events:
       - http:
-          path: users/{id}
+          path: user/{id}
           method: delete
           cors: true
 
 resources:
   Resources:
-    TodosDynamoDbTable:
+    UsersDynamoDbTable:
       Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
@@ -82,4 +90,4 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        TableName: "${self:provider.environment.USERS_TABLE}"

@@ -9,7 +9,7 @@ db = boto3.resource("dynamodb")
 
 def get(event, context):
     try:
-        table = db.Table(os.environ["DYNAMODB_TABLE"])
+        table = db.Table(os.environ["USERS_TABLE"])
         result = table.get_item(Key={"id": event["pathParameters"]["id"]})
         response = {"statusCode": 200, "body": json.dumps(result["Item"])}
         return response

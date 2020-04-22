@@ -3,7 +3,7 @@ provider:
   name: aws
   runtime: python3.8
   environment:
-    USERS_TABLE: "users-table-${self:provider.stage}"
+    SOCIAL_APP_TABLE: "social-app-table2-${self:provider.stage}"
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -13,7 +13,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:us-east-1:*:table/${self:provider.environment.USERS_TABLE}"
+      Resource: "arn:aws:dynamodb:us-east-1:*:table/${self:provider.environment.SOCIAL_APP_TABLE}"
   stage: dev
   region: us-east-1
 
@@ -35,13 +35,13 @@ functions:
           method: post
           cors: true
 
-#  follow:
-#    handler: users/follow.follow
-#    events:
-#      - http:
-#          path: user/{id}
-#          method: put
-#          cors: true
+  follow:
+    handler: following/follow.follow
+    events:
+      - http:
+          path: user/{id}
+          method: put
+          cors: true
 
   list:
     handler: users/list.list
@@ -77,17 +77,17 @@ functions:
 
 resources:
   Resources:
-    UsersDynamoDbTable:
+    SocialAppDynamoDbTable:
       Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
+          - AttributeName: "id"
+            AttributeType: "S"
         KeySchema:
-          - AttributeName: id
-            KeyType: HASH
+          - AttributeName: "id"
+            KeyType: "HASH"
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: "${self:provider.environment.USERS_TABLE}"
+        TableName: "${self:provider.environment.SOCIAL_APP_TABLE}"

@@ -4,17 +4,18 @@ import os
 
 import boto3
 
-db = boto3.resource("dynamodb")
+dynamodb = boto3.resource("dynamodb")
 
 
 def update(event, context):
     if event:
-        data = json.loads(event["body"])
+        # data = event["body"]  # locally
+        data = json.loads(event["body"])  # remote (AWS)
         if "id" not in data:
             logging.error("Validation Failed")
             raise Exception("Couldn't update the user item.")
         try:
-            table = db.Table(os.environ["USERS_TABLE"])
+            table = dynamodb.Table(os.environ["SOCIAL_APP_TABLE"])
             result = table.update_item(
                 Key={"id": event["pathParameters"]["id"]},
                 ExpressionAttributeNames={"#username": "username"},

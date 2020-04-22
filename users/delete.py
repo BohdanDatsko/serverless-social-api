@@ -4,12 +4,12 @@ import os
 
 import boto3
 
-db = boto3.resource("dynamodb")
+dynamodb = boto3.resource("dynamodb")
 
 
 def delete(event, context):
     try:
-        table = db.Table(os.environ["USERS_TABLE"])
+        table = dynamodb.Table(os.environ["SOCIAL_APP_TABLE"])
         table.delete_item(Key={"id": event["pathParameters"]["id"]})
         response = {"statusCode": 200}
         return response

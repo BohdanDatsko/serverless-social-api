@@ -1,21 +1,25 @@
+import os
+
 import boto3
 import uuid
 
-db = boto3.resource("dynamodb")
+dynamodb = boto3.resource("dynamodb")
+# dynamodb = boto3.client("dynamodb")
 
 
-def follow_user(followed_user, following_user):
+def follow(followed_user, following_user):
     user = f"USER#{followed_user}"
     friend = f"#FRIEND#{following_user}"
     user_metadata = f"#METADATA#{followed_user}"
     friend_user = f"USER#{following_user}"
     friend_metadata = f"#METADATA#{following_user}"
     try:
-        resp = db.transact_write_items(
+        table = dynamodb.Table(os.environ["SOCIAL_APP_TABLE"])
+        dynamodb.transact_write_items(
             TransactItems=[
                 {
                     "Put": {
-                        "TableName": "serverless-social-api-dev",
+                        "TableName": table,
                         "Item": {
                             "PK": {"S": user},
                             "SK": {"S": friend},
@@ -28,7 +32,7 @@ def follow_user(followed_user, following_user):
                 },
                 {
                     "Update": {
-                        "TableName": "serverless-social-api-dev",
+                        "TableName": table,
                         "Key": {"PK": {"S": user}, "SK": {"S": user_metadata}},
                         "UpdateExpression": "SET followers = followers + :i",
                         "ExpressionAttributeValues": {":i": {"N": "1"}},
@@ -37,7 +41,7 @@ def follow_user(followed_user, following_user):
                 },
                 {
                     "Update": {
-                        "TableName": "serverless-social-api-dev",
+                        "TableName": table,
                         "Key": {"PK": {"S": friend_user}, "SK": {"S": friend_metadata}},
                         "UpdateExpression": "SET following = following + :i",
                         "ExpressionAttributeValues": {":i": {"N": "1"}},
